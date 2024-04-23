@@ -1,4 +1,4 @@
-namespace Eeraan;
+namespace Sonic;
 
 public class EeraanModule
 {

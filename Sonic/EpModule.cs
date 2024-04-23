@@ -1,7 +1,9 @@
-using static Eeraan.ISysModule.SysCallCtrl;
-using static Eeraan.ISysModule.SysCallNum;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using static Sonic.ISysModule.SysCallCtrl;
+using static Sonic.ISysModule.SysCallNum;
 
-namespace Eeraan;
+namespace Sonic;
 
 public class EpModule
 {
@@ -11,7 +13,7 @@ public class EpModule
         public u8x35 Flattened;
     }
 
-    [InlineArray(MaxEpollEsRet)]
+    [InlineArray(Consts.MaxEpollEsRet)]
     private struct EpollEvent340
     {
         private epoll_event _element0;
@@ -29,10 +31,10 @@ public class EpModule
         public epoll_event Flatten;
     }
 
-    [InlineArray(ReqBufSize * MaxConnPerThrd)]
+    [InlineArray(Consts.ReqBufSize * Consts.MaxConnPerThrd)]
     internal struct AlignedRequestBufferData
     {
-        private u8 _element0;
+        private Byte _element0;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 64)]
@@ -67,7 +69,7 @@ public class EpModule
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public void Run(u16 port, Action<string, i64, string, i64, string, string> callBack)
+    public void Run(UInt16 port, Action<string, Int64, string, Int64, string, string> callBack)
     {
         _sysModule.SysCall(setpriority, PRIO_PROCESS, 0, -19);
 
@@ -102,14 +104,14 @@ public class EpModule
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private void ThreadStart(
-        u16 port,
-        Action<string, i64, string, i64, string, string> callBack,
-        i32 coreId,
-        i32 coreCnt,
+        UInt16 port,
+        Action<string, Int64, string, Int64, string, string> callBack,
+        Int32 coreId,
+        Int32 coreCnt,
         CountdownEvent cntDown
     )
     {
-        var listenerFd = (i32) _networkModule.GetListenerFd(port);
+        var listenerFd = (Int32) _networkModule.GetListenerFd(port);
         _networkModule.SetupConn(listenerFd);
         cntDown.AddCount();
         if (coreId == 0)
@@ -128,49 +130,49 @@ public class EpModule
                 {
                     fd = listenerFd,
                 },
-                events = (u32) EPOLLIN
+                events = (UInt32) EPOLLIN
             }
         };
-        isize epEListenerPtr;
+        IntPtr epEListenerPtr;
         unsafe
         {
-            epEListenerPtr = (isize)(&epEListener);
+            epEListenerPtr = (IntPtr)(&epEListener);
         }
 
         _sysModule.SysCall(epoll_ctl, epFd, EPOLL_CTL_ADD, listenerFd, epEListenerPtr);
 
         var epEs = new AlignedEpollEvents();
-        isize epEsFPtr;
+        IntPtr epEsFPtr;
         unsafe
         {
-            epEsFPtr = (isize)(&epEs.Flatten);
+            epEsFPtr = (IntPtr)(&epEs.Flatten);
         }
 
         var savedEs = new AlignedEpollEvent();
-        savedEs.Flatten.events = (u32)EPOLLIN;
+        savedEs.Flatten.events = (UInt32)EPOLLIN;
         
         var reqBuff = new AlignedRequestBuffer();
         
         // Init state for tracking request buffer position across events
         var reqBuffCurrAddr = new i64x1048();
-        isize reqBuffCurrAddrPtr;
+        IntPtr reqBuffCurrAddrPtr;
         unsafe
         {
-            reqBuffCurrAddrPtr = (isize) (&reqBuff.Flatten[0]);
+            reqBuffCurrAddrPtr = (IntPtr) (&reqBuff.Flatten[0]);
         }
-        for (var i = 0; i < MaxConnPerThrd; i++)
+        for (var i = 0; i < Consts.MaxConnPerThrd; i++)
         {
-            reqBuffCurrAddr[i] = reqBuffCurrAddrPtr + i * ReqBufSize;
+            reqBuffCurrAddr[i] = reqBuffCurrAddrPtr + i * Consts.ReqBufSize;
         }
         
         var reqBuffResidual = new i64x1048();
         
         
         var resBuff = new AlignedResultBuffer();
-        i64 resBuffStartAddr;
+        Int64 resBuffStartAddr;
         unsafe
         {
-            resBuffStartAddr = (i64)(&resBuff.Flatten[0]);
+            resBuffStartAddr = (Int64)(&resBuff.Flatten[0]);
         }
 
         var epWaitType = EPOLL_TIMEOUT_BLOCKING;
@@ -182,7 +184,7 @@ public class EpModule
                     epoll_wait,
                     epFd,
                     epEsFPtr,
-                    MaxEpollEsRet
+                    Consts.MaxEpollEsRet
                 );
             if (incEsCnt <= 0)
             {
@@ -192,7 +194,7 @@ public class EpModule
 
             epWaitType = EPOLL_TIMEOUT_IMMEDIATE_RETURN;
             
-            for (i32 i = 0; i < incEsCnt; i++)
+            for (Int32 i = 0; i < incEsCnt; i++)
             {
                 //         ,     \    /      ,        
                 //        / \    )\__/(     / \       
@@ -211,10 +213,10 @@ public class EpModule
                     var currFd = epEs.Flatten[0].Data.fd;
                     
                     // DANGER
-                    var reqBuffStartAddr = (isize) (&reqBuff.Flatten[0]) + currFd * ReqBufSize;
+                    var reqBuffStartAddr = (IntPtr) (&reqBuff.Flatten[0]) + currFd * Consts.ReqBufSize;
                     
                     // DANGER
-                    var reqBuffCurrPos = (isize) (&reqBuffCurrAddr[currFd]) + currFd;
+                    var reqBuffCurrPos = (IntPtr) (&reqBuffCurrAddr[currFd]) + currFd;
                     
                     // DANGER
                     var residual = &reqBuffResidual[currFd];
@@ -223,7 +225,7 @@ public class EpModule
                     {
                         var incomingFd = _sysModule.SysCall(accept, listenerFd, 0, 0);
 
-                        if (incomingFd is >= 0 and < MaxConnPerThrd)
+                        if (incomingFd is >= 0 and < Consts.MaxConnPerThrd)
                         {
                             // DANGER
                             reqBuffCurrPos = reqBuffStartAddr;
@@ -232,25 +234,25 @@ public class EpModule
                             *residual = 0;
                             
                             _networkModule.SetupConn(incomingFd);
-                            savedEs.Flatten.Data.fd = (i32)incomingFd;
+                            savedEs.Flatten.Data.fd = (Int32)incomingFd;
 
                             _sysModule.SysCall(
                                 epoll_ctl,
                                 epFd,
                                 EPOLL_CTL_ADD,
                                 incomingFd,
-                                (isize)(&savedEs.Flatten)
+                                (IntPtr)(&savedEs.Flatten)
                             );
                         }
                         else
                         {
-                            _networkModule.CloseConn((i32)epFd, currFd);
+                            _networkModule.CloseConn((Int32)epFd, currFd);
                         }
                     }
                     else
                     {
                         // DANGER
-                        var buffRem = ReqBufSize - (isize)reqBuffCurrPos - (isize)reqBuffStartAddr;
+                        var buffRem = Consts.ReqBufSize - (IntPtr)reqBuffCurrPos - (IntPtr)reqBuffStartAddr;
 
                         var read = _sysModule.SysCall(
                             recvfrom, 
@@ -269,9 +271,9 @@ public class EpModule
 
                             while (reqBuffOffset != (read + *residual))
                             {
-                                i8* method = null;
+                                SByte* method = null;
                                 var methodLen = 0;
-                                i8* path = null;
+                                SByte* path = null;
                                 var pathLen = 0;
 
                                 throw new NotImplementedException();

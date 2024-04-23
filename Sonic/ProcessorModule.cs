@@ -1,19 +1,20 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using static Eeraan.ISysModule.SysCallCtrl;
-using static Eeraan.ISysModule.SysCallNum;
+using static Sonic.ISysModule.SysCallCtrl;
+using static Sonic.ISysModule.SysCallNum;
 
-namespace Eeraan;
+namespace Sonic;
 
 public interface IProcessorModule
 {
-    void SetCurrThrdCpuAffinity(i32 cpuId);
-    i64 LogicalCpuCnt();
+    void SetCurrThrdCpuAffinity(Int32 cpuId);
+    Int64 LogicalCpuCnt();
 }
 
 public class ProcessorModule : IProcessorModule
 {
-    private static readonly isize MaskSize;
+    private static readonly IntPtr MaskSize;
 
     static ProcessorModule()
     {
@@ -30,13 +31,13 @@ public class ProcessorModule : IProcessorModule
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetCurrThrdCpuAffinity(i32 cpuId)
+    public void SetCurrThrdCpuAffinity(Int32 cpuId)
     {
         var mask = new cpu_set_t();
-        isize maskPtr;
+        IntPtr maskPtr;
         unsafe
         {
-            maskPtr = (isize)(&mask);
+            maskPtr = (IntPtr)(&mask);
         }
 
 
@@ -62,10 +63,10 @@ public class ProcessorModule : IProcessorModule
 
         var ctrlMask = new cpu_set_t();
         CpuSet(cpuId, ref ctrlMask);
-        isize ctrlMaskPtr;
+        IntPtr ctrlMaskPtr;
         unsafe
         {
-            ctrlMaskPtr = (isize)(&ctrlMaskPtr);
+            ctrlMaskPtr = (IntPtr)(&ctrlMaskPtr);
         }
 
         res = _sysModule.SysCall(sched_setaffinity, MaskSize, ctrlMaskPtr);
@@ -77,24 +78,24 @@ public class ProcessorModule : IProcessorModule
         return;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        bool CpuIsSet(i32 cpuNum, ref cpu_set_t set)
+        bool CpuIsSet(Int32 cpuNum, ref cpu_set_t set)
         {
-            var chunkIndex = cpuNum / PtrWidthInBits;
-            var chunkOffset = cpuNum % PtrWidthInBits;
+            var chunkIndex = cpuNum / Consts.PtrWidthInBits;
+            var chunkOffset = cpuNum % Consts.PtrWidthInBits;
             return (set.Data[chunkIndex] & (1UL << chunkOffset)) != 0;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static void CpuSet(i32 cpuNum, ref cpu_set_t set)
+        static void CpuSet(Int32 cpuNum, ref cpu_set_t set)
         {
-            var chunkIndex = cpuNum / PtrWidthInBits;
-            var chunkOffset = cpuNum % PtrWidthInBits;
+            var chunkIndex = cpuNum / Consts.PtrWidthInBits;
+            var chunkOffset = cpuNum % Consts.PtrWidthInBits;
             set.Data[chunkIndex] |= 1UL << chunkOffset;
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public i64 LogicalCpuCnt()
+    public Int64 LogicalCpuCnt()
     {
         var cpuCnt = sysconf(_SC_NPROCESSORS_ONLN);
         if (cpuCnt > 0) return cpuCnt;
@@ -107,6 +108,6 @@ public class ProcessorModule : IProcessorModule
 
         // TODO: Find the system call number for sysconf and use ISysModule.SysCall instead.
         [DllImport("libc")]
-        static extern IntPtr sysconf(i32 name);
+        static extern IntPtr sysconf(Int32 name);
     }
 }

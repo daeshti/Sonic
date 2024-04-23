@@ -1,24 +1,26 @@
 using System.Net;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using static Eeraan.ISysModule.SysCallCtrl;
-using static Eeraan.ISysModule.SysCallNum;
+using static Sonic.ISysModule.SysCallCtrl;
+using static Sonic.ISysModule.SysCallNum;
 
-namespace Eeraan;
+namespace Sonic;
 
 public interface INetworkModule
 {
-    i64 GetListenerFd(u16 port);
-    void SetupConn(isize fd);
-    void CloseConn(i32 epfd, i32 fd);
-    void AttachReusePortClassicBerkeleyPacketFilter(i32 fd);
-    void DebugIncomingCpu(i32 incomingFd, i32 listenerFd, i32 cpuCore);
+    Int64 GetListenerFd(UInt16 port);
+    void SetupConn(IntPtr fd);
+    void CloseConn(Int32 epfd, Int32 fd);
+    void AttachReusePortClassicBerkeleyPacketFilter(Int32 fd);
+    void DebugIncomingCpu(Int32 incomingFd, Int32 listenerFd, Int32 cpuCore);
 }
 
 public class NetworkModule : INetworkModule
 {
-    private static readonly isize SockAddrInSize;
-    private static readonly isize LingerSize;
-    private static readonly isize SockFilterProgSize;
+    private static readonly IntPtr SockAddrInSize;
+    private static readonly IntPtr LingerSize;
+    private static readonly IntPtr SockFilterProgSize;
     private static readonly linger SockLingerTimeout;
 
     static NetworkModule()
@@ -39,17 +41,17 @@ public class NetworkModule : INetworkModule
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public i64 GetListenerFd(u16 port)
+    public Int64 GetListenerFd(UInt16 port)
     {
-        var tcpFastOpenQueueLen = MaxConnPerThrd;
+        var tcpFastOpenQueueLen = Consts.MaxConnPerThrd;
 
         var fdListener = _sysModule.SysCall(socket, AF_INET, SOCK_STREAM, 0);
-        var optSize = sizeof(i64);
+        var optSize = sizeof(Int64);
         var opt = POSITIVE;
-        isize optPtr;
+        IntPtr optPtr;
         unsafe
         {
-            optPtr = (isize)(&opt);
+            optPtr = (IntPtr)(&opt);
         }
 
         _sysModule.SysCall(
@@ -64,15 +66,15 @@ public class NetworkModule : INetworkModule
         var addr = new sockaddr_in
         {
             sin_family = AF_INET,
-            sin_port = (u16)IPAddress.HostToNetworkOrder(port),
-            sin_addr = new in_addr { s_addr = (u32)IPAddress.HostToNetworkOrder(INADDR_ANY) },
+            sin_port = (UInt16)IPAddress.HostToNetworkOrder(port),
+            sin_addr = new in_addr { s_addr = (UInt32)IPAddress.HostToNetworkOrder(INADDR_ANY) },
             sin_zero = new u8x8(),
         };
 
-        isize addressPointer;
+        IntPtr addressPointer;
         unsafe
         {
-            addressPointer = (isize)(&addr);
+            addressPointer = (IntPtr)(&addr);
         }
 
         _sysModule.SysCall(
@@ -88,13 +90,13 @@ public class NetworkModule : INetworkModule
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetupConn(isize fd)
+    public void SetupConn(IntPtr fd)
     {
         var opt = POSITIVE;
-        isize optPtr;
+        IntPtr optPtr;
         unsafe
         {
-            optPtr = (isize)(&opt);
+            optPtr = (IntPtr)(&opt);
         }
 
         _sysModule.SysCall(
@@ -103,20 +105,20 @@ public class NetworkModule : INetworkModule
             IPPROTO_TCP,
             TCP_NODELAY,
             optPtr,
-            sizeof(i32)
+            sizeof(Int32)
         );
 
         _sysModule.SysCall(SYS_FCNTL, fd, F_SETFL, O_NONBLOCK);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void CloseConn(i32 epfd, i32 fd)
+    public void CloseConn(Int32 epfd, Int32 fd)
     {
         var opt = SockLingerTimeout;
-        isize optPointer;
+        IntPtr optPointer;
         unsafe
         {
-            optPointer = (isize)(&opt);
+            optPointer = (IntPtr)(&opt);
         }
 
         _sysModule.SysCall(
@@ -139,24 +141,24 @@ public class NetworkModule : INetworkModule
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AttachReusePortClassicBerkeleyPacketFilter(i32 fd)
+    public void AttachReusePortClassicBerkeleyPacketFilter(Int32 fd)
     {
         var code = new sock_filter_x2();
         code[0] = new sock_filter
-            { code = BPF_LD | BPF_W | BPF_ABS, jt = 0, jf = 0, k = unchecked((u32)(SKF_AD_OFF + SKF_AD_CPU)) };
+            { code = BPF_LD | BPF_W | BPF_ABS, jt = 0, jf = 0, k = unchecked((UInt32)(SKF_AD_OFF + SKF_AD_CPU)) };
         code[1] = new sock_filter { code = BPF_RET | BPF_A, jt = 0, jf = 0, k = 0 };
         
-        isize codePtr;
+        IntPtr codePtr;
         unsafe
         {
-            codePtr = (isize)(&code[0]);
+            codePtr = (IntPtr)(&code[0]);
         }
 
         var prog = new sock_fprog { len = 2, filterPtr = codePtr };
-        isize progPtr;
+        IntPtr progPtr;
         unsafe
         {
-            progPtr = (isize)(&prog);
+            progPtr = (IntPtr)(&prog);
         }
 
         _sysModule.SysCall(
@@ -170,13 +172,13 @@ public class NetworkModule : INetworkModule
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void DebugIncomingCpu(i32 incomingFd, i32 listenerFd, i32 cpuCore)
+    public void DebugIncomingCpu(Int32 incomingFd, Int32 listenerFd, Int32 cpuCore)
     {
         var incCpu = -1;
-        isize incCpuPtr;
+        IntPtr incCpuPtr;
         unsafe
         {
-            incCpuPtr = (isize)Unsafe.AsPointer(ref incCpu);
+            incCpuPtr = (IntPtr)Unsafe.AsPointer(ref incCpu);
         }
 
         var incomingCpuRet = _sysModule.SysCall(
@@ -185,14 +187,14 @@ public class NetworkModule : INetworkModule
             SOL_SOCKET,
             SO_INCOMING_CPU,
             incCpuPtr,
-            sizeof(i32)
+            sizeof(Int32)
         );
 
         var listeningCpu = -1;
-        isize listeningCpuPointer;
+        IntPtr listeningCpuPointer;
         unsafe
         {
-            listeningCpuPointer = (isize)Unsafe.AsPointer(ref listeningCpu);
+            listeningCpuPointer = (IntPtr)Unsafe.AsPointer(ref listeningCpu);
         }
 
         var listenerCpuRet = _sysModule.SysCall(
@@ -201,14 +203,14 @@ public class NetworkModule : INetworkModule
             SOL_SOCKET,
             SO_INCOMING_CPU,
             listeningCpuPointer,
-            sizeof(i32)
+            sizeof(Int32)
         );
 
         var incNapiId = -1;
-        isize incNapiIdPtr;
+        IntPtr incNapiIdPtr;
         unsafe
         {
-            incNapiIdPtr = (isize)Unsafe.AsPointer(ref incNapiId);
+            incNapiIdPtr = (IntPtr)Unsafe.AsPointer(ref incNapiId);
         }
 
         var incNapiIdRet = _sysModule.SysCall(
@@ -217,7 +219,7 @@ public class NetworkModule : INetworkModule
             SOL_SOCKET,
             SO_INCOMING_NAPI_ID,
             incNapiIdPtr,
-            sizeof(i32)
+            sizeof(Int32)
         );
 
         _logger.LogDebug(

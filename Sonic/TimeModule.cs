@@ -1,7 +1,8 @@
-using static Eeraan.ISysModule.SysCallCtrl;
-using static Eeraan.ISysModule.SysCallNum;
+using System.Runtime.CompilerServices;
+using static Sonic.ISysModule.SysCallCtrl;
+using static Sonic.ISysModule.SysCallNum;
 
-namespace Eeraan;
+namespace Sonic;
 
 
 public interface ITimeModule
@@ -30,41 +31,41 @@ public sealed class TimeModule : ITimeModule
     static TimeModule()
     {
         EpochAsUtf8BuffCached = new u8x35();
-        EpochAsUtf8BuffCached[0] = (u8)'D';
-        EpochAsUtf8BuffCached[1] = (u8)'a';
-        EpochAsUtf8BuffCached[2] = (u8)'t';
-        EpochAsUtf8BuffCached[3] = (u8)'e';
-        EpochAsUtf8BuffCached[4] = (u8)':';
-        EpochAsUtf8BuffCached[5] = (u8)' ';
-        EpochAsUtf8BuffCached[6] = (u8)' ';
-        EpochAsUtf8BuffCached[7] = (u8)' ';
-        EpochAsUtf8BuffCached[8] = (u8)' ';
-        EpochAsUtf8BuffCached[9] = (u8)',';
-        EpochAsUtf8BuffCached[10] = (u8)' ';
-        EpochAsUtf8BuffCached[11] = (u8)'0';
-        EpochAsUtf8BuffCached[12] = (u8)'0';
-        EpochAsUtf8BuffCached[13] = (u8)' ';
-        EpochAsUtf8BuffCached[14] = (u8)' ';
-        EpochAsUtf8BuffCached[15] = (u8)' ';
-        EpochAsUtf8BuffCached[16] = (u8)' ';
-        EpochAsUtf8BuffCached[17] = (u8)' ';
-        EpochAsUtf8BuffCached[18] = (u8)'0';
-        EpochAsUtf8BuffCached[19] = (u8)'0';
-        EpochAsUtf8BuffCached[20] = (u8)'0';
-        EpochAsUtf8BuffCached[21] = (u8)'0';
-        EpochAsUtf8BuffCached[22] = (u8)' ';
-        EpochAsUtf8BuffCached[23] = (u8)'0';
-        EpochAsUtf8BuffCached[24] = (u8)'0';
-        EpochAsUtf8BuffCached[25] = (u8)':';
-        EpochAsUtf8BuffCached[26] = (u8)'0';
-        EpochAsUtf8BuffCached[27] = (u8)'0';
-        EpochAsUtf8BuffCached[28] = (u8)':';
-        EpochAsUtf8BuffCached[29] = (u8)'0';
-        EpochAsUtf8BuffCached[30] = (u8)'0';
-        EpochAsUtf8BuffCached[31] = (u8)' ';
-        EpochAsUtf8BuffCached[32] = (u8)'G';
-        EpochAsUtf8BuffCached[33] = (u8)'M';
-        EpochAsUtf8BuffCached[34] = (u8)'T';
+        EpochAsUtf8BuffCached[0] = (Byte)'D';
+        EpochAsUtf8BuffCached[1] = (Byte)'a';
+        EpochAsUtf8BuffCached[2] = (Byte)'t';
+        EpochAsUtf8BuffCached[3] = (Byte)'e';
+        EpochAsUtf8BuffCached[4] = (Byte)':';
+        EpochAsUtf8BuffCached[5] = (Byte)' ';
+        EpochAsUtf8BuffCached[6] = (Byte)' ';
+        EpochAsUtf8BuffCached[7] = (Byte)' ';
+        EpochAsUtf8BuffCached[8] = (Byte)' ';
+        EpochAsUtf8BuffCached[9] = (Byte)',';
+        EpochAsUtf8BuffCached[10] = (Byte)' ';
+        EpochAsUtf8BuffCached[11] = (Byte)'0';
+        EpochAsUtf8BuffCached[12] = (Byte)'0';
+        EpochAsUtf8BuffCached[13] = (Byte)' ';
+        EpochAsUtf8BuffCached[14] = (Byte)' ';
+        EpochAsUtf8BuffCached[15] = (Byte)' ';
+        EpochAsUtf8BuffCached[16] = (Byte)' ';
+        EpochAsUtf8BuffCached[17] = (Byte)' ';
+        EpochAsUtf8BuffCached[18] = (Byte)'0';
+        EpochAsUtf8BuffCached[19] = (Byte)'0';
+        EpochAsUtf8BuffCached[20] = (Byte)'0';
+        EpochAsUtf8BuffCached[21] = (Byte)'0';
+        EpochAsUtf8BuffCached[22] = (Byte)' ';
+        EpochAsUtf8BuffCached[23] = (Byte)'0';
+        EpochAsUtf8BuffCached[24] = (Byte)'0';
+        EpochAsUtf8BuffCached[25] = (Byte)':';
+        EpochAsUtf8BuffCached[26] = (Byte)'0';
+        EpochAsUtf8BuffCached[27] = (Byte)'0';
+        EpochAsUtf8BuffCached[28] = (Byte)':';
+        EpochAsUtf8BuffCached[29] = (Byte)'0';
+        EpochAsUtf8BuffCached[30] = (Byte)'0';
+        EpochAsUtf8BuffCached[31] = (Byte)' ';
+        EpochAsUtf8BuffCached[32] = (Byte)'G';
+        EpochAsUtf8BuffCached[33] = (Byte)'M';
+        EpochAsUtf8BuffCached[34] = (Byte)'T';
     }
 
     private readonly ISysModule _sysModule;
@@ -95,10 +96,10 @@ public sealed class TimeModule : ITimeModule
     {
         var secsSinceEpoch = SecsSinceEpoch();
         
-        const i64 leapEpoch = 11017;
-        const i64 daysPer400Years = 365 * 400 + 97;
-        const i64 daysPer100Years = 365 * 100 + 24;
-        const i64 daysPer4Years = 365 * 4 + 1;
+        const Int64 leapEpoch = 11017;
+        const Int64 daysPer400Years = 365 * 400 + 97;
+        const Int64 daysPer100Years = 365 * 100 + 24;
+        const Int64 daysPer4Years = 365 * 4 + 1;
 
         var days = (secsSinceEpoch / 86400) - leapEpoch;
         var secsOfDay = secsSinceEpoch % 86400;
@@ -138,8 +139,8 @@ public sealed class TimeModule : ITimeModule
 
         var year = 2000 + remYears + 4 * qCycles + 100 * cCycles + 400 * qcCycles;
 
-        ReadOnlySpan<i64> monthLengths = stackalloc i64[] { 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 31, 29 };
-        i64 month = 0;
+        ReadOnlySpan<Int64> monthLengths = stackalloc Int64[] { 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 31, 29 };
+        Int64 month = 0;
         foreach (var monthLength in monthLengths)
         {
             month += 1;
@@ -160,53 +161,53 @@ public sealed class TimeModule : ITimeModule
             weekDay += 7;
         }
 
-        var sec = (u8)(secsOfDay % 60);
-        var min = (u8)((secsOfDay % 3600) / 60);
-        var hour = (u8)(secsOfDay / 3600);
-        var day = (u8)mDay;
-        var monthByte = (u8)month;
+        var sec = (Byte)(secsOfDay % 60);
+        var min = (Byte)((secsOfDay % 3600) / 60);
+        var hour = (Byte)(secsOfDay / 3600);
+        var day = (Byte)mDay;
+        var monthByte = (Byte)month;
         var yearUshort = (ushort)year;
-        var weekDayByte = (u8)weekDay;
+        var weekDayByte = (Byte)weekDay;
 
 
         var weekDayStr = DayOfWeek(weekDayByte);
         var monthStr = Month(monthByte);
 
-        res[6] = (u8)weekDayStr[0];
-        res[7] = (u8)weekDayStr[1];
-        res[8] = (u8)weekDayStr[2];
+        res[6] = (Byte)weekDayStr[0];
+        res[7] = (Byte)weekDayStr[1];
+        res[8] = (Byte)weekDayStr[2];
 
-        res[11] = (u8)(day / 10 + '0');
-        res[12] = (u8)(day % 10 + '0');
+        res[11] = (Byte)(day / 10 + '0');
+        res[12] = (Byte)(day % 10 + '0');
 
-        res[14] = (u8)monthStr[0];
-        res[15] = (u8)monthStr[1];
-        res[16] = (u8)monthStr[2];
+        res[14] = (Byte)monthStr[0];
+        res[15] = (Byte)monthStr[1];
+        res[16] = (Byte)monthStr[2];
 
-        res[18] = (u8)(yearUshort / 1000 + '0');
-        res[19] = (u8)((yearUshort / 100) % 10 + '0');
-        res[20] = (u8)((yearUshort / 10) % 10 + '0');
-        res[21] = (u8)(yearUshort % 10 + '0');
+        res[18] = (Byte)(yearUshort / 1000 + '0');
+        res[19] = (Byte)((yearUshort / 100) % 10 + '0');
+        res[20] = (Byte)((yearUshort / 10) % 10 + '0');
+        res[21] = (Byte)(yearUshort % 10 + '0');
 
-        res[23] = (u8)(hour / 10 + '0');
-        res[24] = (u8)(hour % 10 + '0');
+        res[23] = (Byte)(hour / 10 + '0');
+        res[24] = (Byte)(hour % 10 + '0');
 
-        res[26] = (u8)(min / 10 + '0');
-        res[27] = (u8)(min % 10 + '0');
+        res[26] = (Byte)(min / 10 + '0');
+        res[27] = (Byte)(min % 10 + '0');
 
-        res[29] = (u8)(sec / 10 + '0');
-        res[30] = (u8)(sec % 10 + '0');
+        res[29] = (Byte)(sec / 10 + '0');
+        res[30] = (Byte)(sec % 10 + '0');
         return;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        i64 SecsSinceEpoch()
+        Int64 SecsSinceEpoch()
         {
             timespec ts = new();
             
-            isize resPtr;
+            IntPtr resPtr;
             unsafe
             {
-                resPtr = (isize)(&ts);
+                resPtr = (IntPtr)(&ts);
             }
 
             _sysModule.SysCall(clock_gettime, CLOCK_REALTIME, resPtr);
@@ -215,7 +216,7 @@ public sealed class TimeModule : ITimeModule
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        string DayOfWeek(i32 index)
+        string DayOfWeek(Int32 index)
         {
             return index switch
             {
@@ -231,7 +232,7 @@ public sealed class TimeModule : ITimeModule
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        string Month(i32 index)
+        string Month(Int32 index)
         {
             return index switch
             {
