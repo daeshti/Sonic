@@ -23,49 +23,18 @@ public interface ITimeModule
 }
 
 /// <inheritdoc cref="ITimeModule"/>
-
 public sealed class TimeModule : ITimeModule
 {
     private static readonly ByteX35 EpochAsUtf8BuffCached;
 
     static TimeModule()
     {
+        const string epochStr = "Date: Thu, 01 Jan 1970 00:00:00 GMT";
         EpochAsUtf8BuffCached = new ByteX35();
-        EpochAsUtf8BuffCached[0] = (byte)'D';
-        EpochAsUtf8BuffCached[1] = (byte)'a';
-        EpochAsUtf8BuffCached[2] = (byte)'t';
-        EpochAsUtf8BuffCached[3] = (byte)'e';
-        EpochAsUtf8BuffCached[4] = (byte)':';
-        EpochAsUtf8BuffCached[5] = (byte)' ';
-        EpochAsUtf8BuffCached[6] = (byte)' ';
-        EpochAsUtf8BuffCached[7] = (byte)' ';
-        EpochAsUtf8BuffCached[8] = (byte)' ';
-        EpochAsUtf8BuffCached[9] = (byte)',';
-        EpochAsUtf8BuffCached[10] = (byte)' ';
-        EpochAsUtf8BuffCached[11] = (byte)'0';
-        EpochAsUtf8BuffCached[12] = (byte)'0';
-        EpochAsUtf8BuffCached[13] = (byte)' ';
-        EpochAsUtf8BuffCached[14] = (byte)' ';
-        EpochAsUtf8BuffCached[15] = (byte)' ';
-        EpochAsUtf8BuffCached[16] = (byte)' ';
-        EpochAsUtf8BuffCached[17] = (byte)' ';
-        EpochAsUtf8BuffCached[18] = (byte)'0';
-        EpochAsUtf8BuffCached[19] = (byte)'0';
-        EpochAsUtf8BuffCached[20] = (byte)'0';
-        EpochAsUtf8BuffCached[21] = (byte)'0';
-        EpochAsUtf8BuffCached[22] = (byte)' ';
-        EpochAsUtf8BuffCached[23] = (byte)'0';
-        EpochAsUtf8BuffCached[24] = (byte)'0';
-        EpochAsUtf8BuffCached[25] = (byte)':';
-        EpochAsUtf8BuffCached[26] = (byte)'0';
-        EpochAsUtf8BuffCached[27] = (byte)'0';
-        EpochAsUtf8BuffCached[28] = (byte)':';
-        EpochAsUtf8BuffCached[29] = (byte)'0';
-        EpochAsUtf8BuffCached[30] = (byte)'0';
-        EpochAsUtf8BuffCached[31] = (byte)' ';
-        EpochAsUtf8BuffCached[32] = (byte)'G';
-        EpochAsUtf8BuffCached[33] = (byte)'M';
-        EpochAsUtf8BuffCached[34] = (byte)'T';
+        for (var i = 0; i < 35; i++)
+        {
+            EpochAsUtf8BuffCached[i] = (byte)epochStr[0];
+        }
     }
 
     private readonly ISysModule _sysModule;

@@ -4,20 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="24919a0f-6f39-498b-b06c-97dfedebe10e" name="Changes" comment="Initial commit.">
-      <change afterPath="$PROJECT_DIR$/Sonic/AbstractRequestPathModule.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sonic/ContentLengthModule.cs" afterDir="false" />
+    <list default="true" id="24919a0f-6f39-498b-b06c-97dfedebe10e" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Eeraan/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Eeraan/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sonic/Consts.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/Consts.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sonic/EeraanModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/SonicModule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sonic/EpModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/EpModule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sonic/Extensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/Extensions.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sonic/Globalism.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/Globalism.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sonic/NetworkModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/NetworkModule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sonic/ProcessorModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/ProcessorModule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sonic/ReadMe.md" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/ReadMe.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sonic/SysModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/SysModule.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sonic/TimeModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/TimeModule.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,7 +62,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1713907505675</updated>
-      <workItem from="1713907506716" duration="12272000" />
+      <workItem from="1713907506716" duration="12753000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit.">
       <option name="closed" value="true" />
@@ -84,7 +72,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713907578190</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Prepare a rough implementation.">
+      <option name="closed" value="true" />
+      <created>1713973433304</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1713973433304</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -94,6 +90,7 @@
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Initial commit." />
-    <option name="LAST_COMMIT_MESSAGE" value="Initial commit." />
+    <MESSAGE value="Prepare a rough implementation." />
+    <option name="LAST_COMMIT_MESSAGE" value="Prepare a rough implementation." />
   </component>
 </project>

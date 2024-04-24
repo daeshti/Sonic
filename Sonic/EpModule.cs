@@ -6,7 +6,14 @@ using static Sonic.ISysModule.SysCallNum;
 
 namespace Sonic;
 
-public sealed class EpModule
+public delegate int CallBack(in HttpContext context);
+
+public interface IEpModule
+{
+    void Run(ushort port, CallBack callBack);
+}
+
+public sealed class EpModule : IEpModule
 {
     [StructLayout(LayoutKind.Sequential, Pack = 64)]
     private struct AlignedHttpDate
@@ -73,7 +80,7 @@ public sealed class EpModule
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public void Run(ushort port, Action<string, string, IntPtr, ByteX35> callBack)
+    public void Run(ushort port, CallBack callBack)
     {
         _sysModule.SysCall(setpriority, PRIO_PROCESS, 0, -19);
 
@@ -88,10 +95,10 @@ public sealed class EpModule
             {
                 _sysModule.SysCall(unshare, CLONE_FILES);
                 _processorModule.SetCurrThrdCpuAffinity(coreId);
-                ThreadStart(port, callBack, coreId, coreCnt, cntDown);
+                ThreadStart(port, callBack, coreId, cntDown);
             }, maxStackSize: 1024 * 1024 * 8)
             {
-                Name = $"ecbatana{c}",
+                Name = $"sonic{c}",
             };
         }
 
@@ -109,9 +116,8 @@ public sealed class EpModule
     [MethodImpl(MethodImplOptions.NoInlining)]
     private void ThreadStart(
         ushort port,
-        Action<string, string, IntPtr, ByteX35> callBack,
+        CallBack callBack,
         int coreId,
-        int coreCnt,
         CountdownEvent cntDown
     )
     {
@@ -294,13 +300,16 @@ public sealed class EpModule
                                     reqBuffOffset += reqBuffBytesParsed;
                                     var methodStr = MethodStr(method, methodLen);
                                     var pathStr = PathStr(path, pathLen);
-                                    callBack(
-                                        methodStr,
-                                        pathStr,
-                                        (IntPtr)resBuffStartAddr + resBuffFilledTotal,
-                                        _date
-                                    );
-                                    var resBuffFilled = 0;
+                                    var context = new HttpContext
+                                    {
+                                        Method = method,
+                                        MethodLen = methodLen,
+                                        Path = path,
+                                        PathLen = pathLen,
+                                        Date = _date,
+                                        ResBuff = (IntPtr)resBuffStartAddr + resBuffFilledTotal
+                                    };
+                                    var resBuffFilled = callBack(context);
 
                                     resBuffFilledTotal += resBuffFilled;
                                 }
@@ -366,110 +375,149 @@ public sealed class EpModule
             }
         }
 
-        // a best afford no alloc cached function to convert sbyte* to string holding a Http method.
+        // A best effort no alloc cached function to convert sbyte* to a string holding a Http method.
+        // A normal person would probably generate this.
         unsafe string MethodStr(sbyte* methodPtr, int methodLen)
         {
-            switch (methodLen)
+            const byte Null = (byte)'\0';
+            const byte A = (byte)'A';
+            const byte C = (byte)'C';
+            const byte D = (byte)'D';
+            const byte E = (byte)'E';
+            const byte F = (byte)'F';
+            const byte G = (byte)'G';
+            const byte H = (byte)'H';
+            const byte I = (byte)'I';
+            const byte L = (byte)'L';
+            const byte M = (byte)'M';
+            const byte N = (byte)'N';
+            const byte O = (byte)'O';
+            const byte P = (byte)'P';
+            const byte R = (byte)'R';
+            const byte S = (byte)'S';
+            const byte T = (byte)'T';
+            const byte U = (byte)'U';
+
+            var method = (byte*)methodPtr;
+
+            var x0 = methodLen > 0 ? method[0] : Null;
+            var x1 = methodLen > 1 ? method[1] : Null;
+            var x2 = methodLen > 2 ? method[2] : Null;
+            var x3 = methodLen > 3 ? method[3] : Null;
+            var x4 = methodLen > 4 ? method[4] : Null;
+            var x5 = methodLen > 5 ? method[5] : Null;
+            var x6 = methodLen > 6 ? method[6] : Null;
+
+            switch (x0)
             {
-                case 3:
+                case C:
                 {
-                    var a = methodPtr[0];
-                    var b = methodPtr[1];
-                    var c = methodPtr[2];
-                    switch (a)
+                    if (x1 == O && x2 == N && x3 == N && x4 == E && x5 == C && x6 == T)
                     {
-                        case (sbyte)'G' when b == (sbyte)'E' && c == (sbyte)'T':
-                            return "GET";
-                        case (sbyte)'P' when b == (sbyte)'U' && c == (sbyte)'T':
-                            return "PUT";
+                        return "CONNECT";
+                    }
+                    break;
+                }
+                case D:
+                {
+                    if (x1 == E && x2 == L && x3 == E && x4 == T && x5 == E)
+                    {
+                        return "DELETE";
                     }
 
-                    goto default;
+                    break;
                 }
-                case 4:
+                case E:
                 {
-                    var a = methodPtr[0];
-                    var b = methodPtr[1];
-                    var c = methodPtr[2];
-                    var d = methodPtr[3];
-                    switch (a)
+                    break;
+                }
+                case F:
+                {
+                    break;
+                }
+                case G:
+                {
+                    if (x1 == E && x2 == T)
                     {
-                        case (sbyte)'H' when b == (sbyte)'E' && c == (sbyte)'A' && d == (sbyte)'D':
-                            return "HEAD";
-                        case (sbyte)'P' when b == (sbyte)'O' && c == (sbyte)'S' && d == (sbyte)'T':
-                            return "POST";
+                        return "GET";
                     }
 
-                    goto default;
+                    break;
                 }
-                case 5:
+                case H:
                 {
-                    var a = methodPtr[0];
-                    var b = methodPtr[1];
-                    var c = methodPtr[2];
-                    var d = methodPtr[3];
-                    var e = methodPtr[4];
-                    switch (a)
+                    if (x1 == E && x2 == A && x3 == D)
                     {
-                        case (sbyte)'P' when b == (sbyte)'A' && c == (sbyte)'T' && d == (sbyte)'C' && e == (sbyte)'H':
-                            return "PATCH";
-                        case (sbyte)'T' when b == (sbyte)'R' && c == (sbyte)'A' && d == (sbyte)'C' && e == (sbyte)'E':
-                            return "TRACE";
+                        return "HEAD";
                     }
 
-                    goto default;
+                    break;
                 }
-
-                case 6:
-                {
-                    var a = methodPtr[0];
-                    var b = methodPtr[1];
-                    var c = methodPtr[2];
-                    var d = methodPtr[3];
-                    var e = methodPtr[4];
-                    var f = methodPtr[5];
-                    switch (a)
-                    {
-                        case (sbyte)'D' when b == (sbyte)'E' && c == (sbyte)'L' && d == (sbyte)'E'
-                                             && e == (sbyte)'T' && f == (sbyte)'E':
-                            return "DELETE";
-                        case (sbyte)'M' when b == (sbyte)'E' && c == (sbyte)'T' && d == (sbyte)'H'
-                                             && e == (sbyte)'O' && f == (sbyte)'D':
-                            return "METHOD";
-                    }
-
-                    goto default;
-                }
-                case 7:
-                {
-                    var a = methodPtr[0];
-                    var b = methodPtr[1];
-                    var c = methodPtr[2];
-                    var d = methodPtr[3];
-                    var e = methodPtr[4];
-                    var f = methodPtr[5];
-                    var g = methodPtr[6];
-                    switch (a)
-                    {
-                        case (sbyte)'C' when b == (sbyte)'O' && c == (sbyte)'N' && d == (sbyte)'N'
-                                             && e == (sbyte)'E' && f == (sbyte)'C' && g == (sbyte)'T':
-                            return "CONNECT";
-                        case (sbyte)'O' when b == (sbyte)'P' && c == (sbyte)'T' && d == (sbyte)'I'
-                                             && e == (sbyte)'O' && f == (sbyte)'N' && g == (sbyte)'S':
-                            return "OPTIONS";
-                    }
-
-                    goto default;
-                }
-
                 default:
                 {
-                    var uMethodPtr = (byte*)methodPtr;
-                    return Encoding.UTF8.GetString(uMethodPtr, methodLen);
+                    switch (x0)
+                    {
+                        case M:
+                        {
+                            if (x1 == E && x2 == T && x3 == H && x4 == O && x5 == D)
+                            {
+                                return "METHOD";
+                            }
+
+                            break;
+                        }
+                        case N:
+                        {
+                            break;
+                        }
+                        case O:
+                        {
+                            if (x1 == P && x2 == T && x3 == I && x4 == O && x5 == N && x6 == S)
+                            {
+                                return "OPTIONS";
+                            }
+
+                            break;
+                        }
+                        case P:
+                        {
+                            if (x1 == U && x2 == T)
+                            {
+                                return "PUT";
+                            }
+
+                            if (x1 == O && x2 == S && x3 == T)
+                            {
+                                return "POST";
+                            }
+
+                            if (x1 == A && x2 == T && x3 == C && x4 == H)
+                            {
+                                return "PATCH";
+                            }
+
+                            break;
+                        }
+                        default:
+                        {
+                            if (x0 != T || x1 != R || x2 != A || x3 != C || x4 != E)
+                            {
+                                break;
+                            }
+
+                            return "TRACE";
+                        }
+                    }
+
+                    break;
                 }
             }
+
+            return Encoding.UTF8.GetString((byte*)methodPtr, methodLen);
         }
 
+        // This method can't be stack allocated because Safari allows a path of up to 80K chars
+        // TODO: Let the OP Threads provide pre allocated memory for this
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         unsafe string PathStr(sbyte* pathPtr, int pathLen)
         {
