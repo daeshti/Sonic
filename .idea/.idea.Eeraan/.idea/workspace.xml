@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
     <list default="true" id="24919a0f-6f39-498b-b06c-97dfedebe10e" name="Changes" comment="Initial commit.">
-      <change beforePath="$PROJECT_DIR$/Eeraa /Consts.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eeraa /Eeraan.csproj" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eeraa /EeraanModule.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eeraa /EpModule.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eeraa /Extensions.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eeraa /Globalism.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eeraa /NetworkModule.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eeraa /ProcessorModule.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eeraa /ReadMe.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eeraa /SysModule.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eeraa /TimeModule.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Eeraan.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic.sln" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sonic/AbstractRequestPathModule.cs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sonic/ContentLengthModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Eeraan/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Eeraan/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sonic/Consts.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/Consts.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sonic/EeraanModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/SonicModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sonic/EpModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/EpModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sonic/Extensions.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/Extensions.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sonic/Globalism.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/Globalism.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sonic/NetworkModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/NetworkModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sonic/ProcessorModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/ProcessorModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sonic/ReadMe.md" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/ReadMe.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sonic/SysModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/SysModule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sonic/TimeModule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Sonic/TimeModule.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,6 +26,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/df33c7fd7db04a829574707592655c01d82000/d7/ed452469/Sse2.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -44,6 +51,10 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "master",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "vue.rearranger.settings.migration": "true"
   },
@@ -63,7 +74,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1713907505675</updated>
-      <workItem from="1713907506716" duration="246000" />
+      <workItem from="1713907506716" duration="12272000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit.">
       <option name="closed" value="true" />

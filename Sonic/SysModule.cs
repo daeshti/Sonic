@@ -48,6 +48,7 @@ public interface ISysModule
         public const IntPtr close = 3;
         public const IntPtr socket = 41;
         public const IntPtr accept = 43;
+        public const IntPtr sendto = 44;
         public const IntPtr recvfrom = 45;
         public const IntPtr bind = 49;
         public const IntPtr listen = 50;
@@ -69,71 +70,76 @@ public interface ISysModule
      */
     public static class SysCallCtrl
     {
-        public const Int32 CLOCK_REALTIME = 0;
+        public const int CLOCK_REALTIME = 0;
         
-        public const Int32 CURRENT_THREAD_CONTROL_PID = 0;
-        public const Int32 _SC_NPROCESSORS_ONLN = 84;
+        public const int CURRENT_THREAD_CONTROL_PID = 0;
+        public const int _SC_NPROCESSORS_ONLN = 84;
         
-        public const Int32 AF_INET = 2;
+        public const int AF_INET = 2;
 
-        public const Int32 SOCK_STREAM = 1;
+        public const int SOCK_STREAM = 1;
         
-        public const Int32 SOL_SOCKET = 1;
+        public const int SOL_SOCKET = 1;
 
-        public const Int32 SO_REUSEPORT = 15;
+        public const int SO_REUSEPORT = 15;
 
         public const IntPtr INADDR_ANY = 0;
         
-        public const Int32 POSITIVE = 1;
+        public const int POSITIVE = 1;
         
-        public const Int32 BUSYPOLL = 50;
+        public const int BUSYPOLL = 50;
         
-        public const Int32 O_NONBLOCK = 2048;
+        public const int O_NONBLOCK = 2048;
         
-        public const Int32 F_SETFL = 4;
+        public const int F_SETFL = 4;
         
-        public const Int32 IPPROTO_TCP = 6;
+        public const int IPPROTO_TCP = 6;
         
-        public const Int32 TCP_NODELAY = 1;
+        public const int TCP_NODELAY = 1;
         
         public const IntPtr SYS_FCNTL = 72;
 
-        public const Int32 SO_LINGER = 13;
+        public const int SO_LINGER = 13;
         
         public const int EPOLL_CTL_ADD = 1;
         public const int EPOLL_CTL_DEL = 2;
 
 
         // BPF_CLASS
-        public const UInt16 BPF_LD = 0x00;
-        public const UInt16 BPF_RET = 0x06;
+        public const ushort BPF_LD = 0x00;
+        public const ushort BPF_RET = 0x06;
 
         // BPF_SIZE
-        public const UInt16 BPF_W = 0x00;
+        public const ushort BPF_W = 0x00;
 
         // BPF_MODE
-        public const UInt16 BPF_ABS = 0x20;
+        public const ushort BPF_ABS = 0x20;
 
         // BPF_RVAL
-        public const UInt16 BPF_A = 0x10;
+        public const ushort BPF_A = 0x10;
 
         // SKF
-        public const Int32 SKF_AD_OFF = -0x1000;
-        public const Int32 SKF_AD_CPU = 36;
+        public const int SKF_AD_OFF = -0x1000;
+        public const int SKF_AD_CPU = 36;
         
-        public const Int32 SO_ATTACH_REUSEPORT_CBPF = 51;
-        public const Int32 SO_INCOMING_CPU = 49;
-        public const Int32 SO_INCOMING_NAPI_ID = 56;
+        public const int SO_ATTACH_REUSEPORT_CBPF = 51;
+        public const int SO_INCOMING_CPU = 49;
+        public const int SO_INCOMING_NAPI_ID = 56;
 
         public const IntPtr PRIO_PROCESS = 0;
 
         public const IntPtr CLONE_FILES = 0x400;
 
-        internal const IntPtr EPOLLIN = 0x1;
+        public const IntPtr EPOLLIN = 0x1;
         
-        internal const int EPOLL_TIMEOUT_BLOCKING = -1;
+        public const int EPOLL_TIMEOUT_BLOCKING = -1;
 
-        internal const int EPOLL_TIMEOUT_IMMEDIATE_RETURN = 0;
+        public const int EPOLL_TIMEOUT_IMMEDIATE_RETURN = 0;
+        
+        public const int EAGAIN = 1;
+
+        public const int EINTR = 4;
+
 
 
     }

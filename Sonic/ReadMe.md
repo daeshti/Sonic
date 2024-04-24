@@ -19,7 +19,8 @@ This is a system project at heart, so we have to choose between either shortenin
 
 ### 3 letter abbreviations
   - Clk: Cloak
-  - Cnt: Count,
+  - Cnt: Count
+  - Eol: End Of Line
   - Idx: Index
   - Ins: Instance
   - Len: Length, Size
@@ -43,6 +44,7 @@ This is a system project at heart, so we have to choose between either shortenin
   - Conn: Connection
   - Ctrl: Control
   - Curr: Current
+  - Patt: Pattern
   - Prog: Program
   - Sock: Socket
 

@@ -10,27 +10,33 @@ namespace Sonic;
 
 // ReSharper disable once InconsistentNaming
 [InlineArray(8)]
-public struct u8x8
+public struct ByteX8
 {
-    private Byte _element0;
+    private byte _element0;
 }
 
 [InlineArray(35)]
-public struct u8x35
+public struct ByteX35
 {
-    private Byte _element0;
+    private byte _element0;
+}
+
+[InlineArray(200)]
+public struct ByteX200
+{
+    private byte _element0;
 }
 
 [InlineArray(Consts.ResBufSize)]
-internal struct u8x4096
+internal struct ByteX4096
 {
-    private Byte _element0;
+    private byte _element0;
 }
 
 [InlineArray(Consts.MaxConnPerThrd)]
-internal struct i64x1048
+internal struct LongX1024
 {
-    private Int64 _element0;
+    private long _element0;
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -43,7 +49,7 @@ internal struct timespec
 [InlineArray(Consts.CpuSetLen)]
 internal struct cpu_set_data_t
 {
-    private UInt64 _element0;
+    private ulong _element0;
 }
     
 [StructLayout(LayoutKind.Sequential, Pack = 64)]
@@ -67,7 +73,7 @@ public struct sockaddr_in
     public in_addr sin_addr;
 
     [MarshalAs(UnmanagedType.ByValArray, SizeConst = 8)]
-    public u8x8 sin_zero;
+    public ByteX8 sin_zero;
 }
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]

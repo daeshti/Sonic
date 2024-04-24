@@ -8,11 +8,11 @@ namespace Sonic;
 
 public interface IProcessorModule
 {
-    void SetCurrThrdCpuAffinity(Int32 cpuId);
-    Int64 LogicalCpuCnt();
+    void SetCurrThrdCpuAffinity(int cpuId);
+    long LogicalCpuCnt();
 }
 
-public class ProcessorModule : IProcessorModule
+public sealed class ProcessorModule : IProcessorModule
 {
     private static readonly IntPtr MaskSize;
 
@@ -21,17 +21,17 @@ public class ProcessorModule : IProcessorModule
         MaskSize = Marshal.SizeOf<cpu_set_t>();
     }
 
-    private readonly ILogger<EeraanModule> _logger;
+    private readonly ILogger<SonicModule> _logger;
     private readonly ISysModule _sysModule;
 
-    public ProcessorModule(ILogger<EeraanModule> logger, ISysModule sysModule)
+    public ProcessorModule(ILogger<SonicModule> logger, ISysModule sysModule)
     {
         _logger = logger;
         _sysModule = sysModule;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetCurrThrdCpuAffinity(Int32 cpuId)
+    public void SetCurrThrdCpuAffinity(int cpuId)
     {
         var mask = new cpu_set_t();
         IntPtr maskPtr;
@@ -78,7 +78,7 @@ public class ProcessorModule : IProcessorModule
         return;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        bool CpuIsSet(Int32 cpuNum, ref cpu_set_t set)
+        bool CpuIsSet(int cpuNum, ref cpu_set_t set)
         {
             var chunkIndex = cpuNum / Consts.PtrWidthInBits;
             var chunkOffset = cpuNum % Consts.PtrWidthInBits;
@@ -86,7 +86,7 @@ public class ProcessorModule : IProcessorModule
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        static void CpuSet(Int32 cpuNum, ref cpu_set_t set)
+        static void CpuSet(int cpuNum, ref cpu_set_t set)
         {
             var chunkIndex = cpuNum / Consts.PtrWidthInBits;
             var chunkOffset = cpuNum % Consts.PtrWidthInBits;
@@ -95,7 +95,7 @@ public class ProcessorModule : IProcessorModule
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Int64 LogicalCpuCnt()
+    public long LogicalCpuCnt()
     {
         var cpuCnt = sysconf(_SC_NPROCESSORS_ONLN);
         if (cpuCnt > 0) return cpuCnt;
@@ -108,6 +108,6 @@ public class ProcessorModule : IProcessorModule
 
         // TODO: Find the system call number for sysconf and use ISysModule.SysCall instead.
         [DllImport("libc")]
-        static extern IntPtr sysconf(Int32 name);
+        static extern IntPtr sysconf(int name);
     }
 }

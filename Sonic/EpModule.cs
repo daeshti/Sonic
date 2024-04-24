@@ -1,16 +1,17 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 using static Sonic.ISysModule.SysCallCtrl;
 using static Sonic.ISysModule.SysCallNum;
 
 namespace Sonic;
 
-public class EpModule
+public sealed class EpModule
 {
     [StructLayout(LayoutKind.Sequential, Pack = 64)]
     private struct AlignedHttpDate
     {
-        public u8x35 Flattened;
+        public ByteX35 Flattened;
     }
 
     [InlineArray(Consts.MaxEpollEsRet)]
@@ -18,7 +19,7 @@ public class EpModule
     {
         private epoll_event _element0;
     }
-    
+
     [StructLayout(LayoutKind.Sequential, Pack = 64)]
     private struct AlignedEpollEvents
     {
@@ -34,7 +35,7 @@ public class EpModule
     [InlineArray(Consts.ReqBufSize * Consts.MaxConnPerThrd)]
     internal struct AlignedRequestBufferData
     {
-        private Byte _element0;
+        private byte _element0;
     }
 
     [StructLayout(LayoutKind.Sequential, Pack = 64)]
@@ -42,34 +43,37 @@ public class EpModule
     {
         public AlignedRequestBufferData Flatten;
     }
-    
+
     [StructLayout(LayoutKind.Sequential, Pack = 64)]
     internal struct AlignedResultBuffer
     {
-        public u8x4096 Flatten;
+        public ByteX4096 Flatten;
     }
 
     private readonly ISysModule _sysModule;
     private readonly ITimeModule _timeModule;
     private readonly IProcessorModule _processorModule;
     private readonly INetworkModule _networkModule;
-    
-    private u8x35 _date;
+    private readonly IRequestPathModule _requestPathModule;
+
+    private ByteX35 _date;
 
     public EpModule(
-        ISysModule sysModule, ITimeModule timeModule, 
-        IProcessorModule processorModule, INetworkModule networkModule)
+        ISysModule sysModule, ITimeModule timeModule,
+        IProcessorModule processorModule, INetworkModule networkModule,
+        IRequestPathModule requestPathModule)
     {
         _sysModule = sysModule;
         _timeModule = timeModule;
         _processorModule = processorModule;
         _networkModule = networkModule;
+        _requestPathModule = requestPathModule;
 
-        _date = new u8x35();
+        _date = new ByteX35();
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public void Run(UInt16 port, Action<string, Int64, string, Int64, string, string> callBack)
+    public void Run(ushort port, Action<string, string, IntPtr, ByteX35> callBack)
     {
         _sysModule.SysCall(setpriority, PRIO_PROCESS, 0, -19);
 
@@ -98,26 +102,26 @@ public class EpModule
             _date = _timeModule.EpochAsUtf8Buff();
             Thread.Sleep(TimeSpan.FromSeconds(1));
         }
-        
+
         // ReSharper disable once FunctionNeverReturns
     }
 
     [MethodImpl(MethodImplOptions.NoInlining)]
     private void ThreadStart(
-        UInt16 port,
-        Action<string, Int64, string, Int64, string, string> callBack,
-        Int32 coreId,
-        Int32 coreCnt,
+        ushort port,
+        Action<string, string, IntPtr, ByteX35> callBack,
+        int coreId,
+        int coreCnt,
         CountdownEvent cntDown
     )
     {
-        var listenerFd = (Int32) _networkModule.GetListenerFd(port);
+        var listenerFd = (int)_networkModule.GetListenerFd(port);
         _networkModule.SetupConn(listenerFd);
         cntDown.AddCount();
         if (coreId == 0)
         {
             cntDown.Wait();
-           _networkModule.AttachReusePortClassicBerkeleyPacketFilter(listenerFd);
+            _networkModule.AttachReusePortClassicBerkeleyPacketFilter(listenerFd);
         }
 
         var epFd = _sysModule.SysCall(epoll_create1, 0);
@@ -130,7 +134,7 @@ public class EpModule
                 {
                     fd = listenerFd,
                 },
-                events = (UInt32) EPOLLIN
+                events = (uint)EPOLLIN
             }
         };
         IntPtr epEListenerPtr;
@@ -149,30 +153,31 @@ public class EpModule
         }
 
         var savedEs = new AlignedEpollEvent();
-        savedEs.Flatten.events = (UInt32)EPOLLIN;
-        
+        savedEs.Flatten.events = (uint)EPOLLIN;
+
         var reqBuff = new AlignedRequestBuffer();
-        
+
         // Init state for tracking request buffer position across events
-        var reqBuffCurrAddr = new i64x1048();
+        var reqBuffCurrAddr = new LongX1024();
         IntPtr reqBuffCurrAddrPtr;
         unsafe
         {
-            reqBuffCurrAddrPtr = (IntPtr) (&reqBuff.Flatten[0]);
+            reqBuffCurrAddrPtr = (IntPtr)(&reqBuff.Flatten[0]);
         }
+
         for (var i = 0; i < Consts.MaxConnPerThrd; i++)
         {
             reqBuffCurrAddr[i] = reqBuffCurrAddrPtr + i * Consts.ReqBufSize;
         }
-        
-        var reqBuffResidual = new i64x1048();
-        
-        
+
+        var reqBuffResidual = new LongX1024();
+
+
         var resBuff = new AlignedResultBuffer();
-        Int64 resBuffStartAddr;
+        long resBuffStartAddr;
         unsafe
         {
-            resBuffStartAddr = (Int64)(&resBuff.Flatten[0]);
+            resBuffStartAddr = (long)(&resBuff.Flatten[0]);
         }
 
         var epWaitType = EPOLL_TIMEOUT_BLOCKING;
@@ -193,8 +198,8 @@ public class EpModule
             }
 
             epWaitType = EPOLL_TIMEOUT_IMMEDIATE_RETURN;
-            
-            for (Int32 i = 0; i < incEsCnt; i++)
+
+            for (var i = 0; i < incEsCnt; i++)
             {
                 //         ,     \    /      ,        
                 //        / \    )\__/(     / \       
@@ -211,13 +216,13 @@ public class EpModule
                 unsafe
                 {
                     var currFd = epEs.Flatten[0].Data.fd;
-                    
+
                     // DANGER
-                    var reqBuffStartAddr = (IntPtr) (&reqBuff.Flatten[0]) + currFd * Consts.ReqBufSize;
-                    
+                    var reqBuffStartAddr = (IntPtr)(&reqBuff.Flatten[0]) + currFd * Consts.ReqBufSize;
+
                     // DANGER
-                    var reqBuffCurrPos = (IntPtr) (&reqBuffCurrAddr[currFd]) + currFd;
-                    
+                    var reqBuffCurrPos = (IntPtr)(&reqBuffCurrAddr[currFd]) + currFd;
+
                     // DANGER
                     var residual = &reqBuffResidual[currFd];
 
@@ -229,12 +234,12 @@ public class EpModule
                         {
                             // DANGER
                             reqBuffCurrPos = reqBuffStartAddr;
-                            
+
                             // DANGER
                             *residual = 0;
-                            
+
                             _networkModule.SetupConn(incomingFd);
-                            savedEs.Flatten.Data.fd = (Int32)incomingFd;
+                            savedEs.Flatten.Data.fd = (int)incomingFd;
 
                             _sysModule.SysCall(
                                 epoll_ctl,
@@ -246,7 +251,7 @@ public class EpModule
                         }
                         else
                         {
-                            _networkModule.CloseConn((Int32)epFd, currFd);
+                            _networkModule.CloseConn(epFd, currFd);
                         }
                     }
                     else
@@ -255,36 +260,221 @@ public class EpModule
                         var buffRem = Consts.ReqBufSize - (IntPtr)reqBuffCurrPos - (IntPtr)reqBuffStartAddr;
 
                         var read = _sysModule.SysCall(
-                            recvfrom, 
-                            currFd, 
-                            reqBuffCurrPos, 
+                            recvfrom,
+                            currFd,
+                            reqBuffCurrPos,
                             buffRem,
-                            0, 
-                            0, 
+                            0,
+                            0,
                             0
                         );
 
                         if (read > 0)
                         {
-                            var reqBuffOffset = 0;
+                            IntPtr reqBuffOffset = 0;
                             var resBuffFilledTotal = 0;
 
                             while (reqBuffOffset != (read + *residual))
                             {
-                                SByte* method = null;
+                                sbyte* method = null;
                                 var methodLen = 0;
-                                SByte* path = null;
+                                sbyte* path = null;
                                 var pathLen = 0;
 
-                                throw new NotImplementedException();
+                                var reqBuffBytesParsed = _requestPathModule.ParseRequestPathPipelinedSimd(
+                                    (sbyte*)(reqBuffCurrPos - *residual + reqBuffOffset),
+                                    (int)(read + *residual - reqBuffOffset),
+                                    &method,
+                                    methodLen,
+                                    &path,
+                                    pathLen);
+
+                                if (reqBuffBytesParsed > 0)
+                                {
+                                    reqBuffOffset += reqBuffBytesParsed;
+                                    var methodStr = MethodStr(method, methodLen);
+                                    var pathStr = PathStr(path, pathLen);
+                                    callBack(
+                                        methodStr,
+                                        pathStr,
+                                        (IntPtr)resBuffStartAddr + resBuffFilledTotal,
+                                        _date
+                                    );
+                                    var resBuffFilled = 0;
+
+                                    resBuffFilledTotal += resBuffFilled;
+                                }
+                                else
+                                {
+                                    break;
+                                }
                             }
+
+                            if (reqBuffOffset == 0 || resBuffFilledTotal == 0)
+                            {
+                                reqBuffCurrPos = reqBuffStartAddr;
+                                *residual = 0;
+                                _networkModule.CloseConn((int)epFd, currFd);
+                                continue;
+                            }
+                            else if (reqBuffOffset == read + *residual)
+                            {
+                                reqBuffCurrPos = reqBuffStartAddr;
+                                *residual = 0;
+                            }
+                            else
+                            {
+                                reqBuffCurrPos += read;
+                                *residual += (read - reqBuffOffset);
+                            }
+
+                            var wrote = _sysModule.SysCall(
+                                sendto,
+                                currFd,
+                                (IntPtr)resBuffStartAddr,
+                                resBuffFilledTotal,
+                                0,
+                                0,
+                                0
+                            );
+                            if (wrote == resBuffFilledTotal)
+                            {
+                            }
+                            else if (-wrote == EAGAIN || -wrote == EINTR)
+                            {
+                                reqBuffCurrPos = reqBuffStartAddr;
+                                *residual = 0;
+                                _networkModule.CloseConn(epFd, currFd);
+                                break;
+                            }
+                            else
+                            {
+                                reqBuffCurrPos = reqBuffStartAddr;
+                                *residual = 0;
+                                _networkModule.CloseConn(epFd, currFd);
+                                continue;
+                            }
+                        }
+                        else if (-read == EAGAIN || -read == EINTR)
+                        {
+                            reqBuffCurrPos = reqBuffStartAddr;
+                            *residual = 0;
+                            _networkModule.CloseConn(epFd, currFd);
                         }
                     }
                 }
             }
         }
-        
-        
+
+        // a best afford no alloc cached function to convert sbyte* to string holding a Http method.
+        unsafe string MethodStr(sbyte* methodPtr, int methodLen)
+        {
+            switch (methodLen)
+            {
+                case 3:
+                {
+                    var a = methodPtr[0];
+                    var b = methodPtr[1];
+                    var c = methodPtr[2];
+                    switch (a)
+                    {
+                        case (sbyte)'G' when b == (sbyte)'E' && c == (sbyte)'T':
+                            return "GET";
+                        case (sbyte)'P' when b == (sbyte)'U' && c == (sbyte)'T':
+                            return "PUT";
+                    }
+
+                    goto default;
+                }
+                case 4:
+                {
+                    var a = methodPtr[0];
+                    var b = methodPtr[1];
+                    var c = methodPtr[2];
+                    var d = methodPtr[3];
+                    switch (a)
+                    {
+                        case (sbyte)'H' when b == (sbyte)'E' && c == (sbyte)'A' && d == (sbyte)'D':
+                            return "HEAD";
+                        case (sbyte)'P' when b == (sbyte)'O' && c == (sbyte)'S' && d == (sbyte)'T':
+                            return "POST";
+                    }
+
+                    goto default;
+                }
+                case 5:
+                {
+                    var a = methodPtr[0];
+                    var b = methodPtr[1];
+                    var c = methodPtr[2];
+                    var d = methodPtr[3];
+                    var e = methodPtr[4];
+                    switch (a)
+                    {
+                        case (sbyte)'P' when b == (sbyte)'A' && c == (sbyte)'T' && d == (sbyte)'C' && e == (sbyte)'H':
+                            return "PATCH";
+                        case (sbyte)'T' when b == (sbyte)'R' && c == (sbyte)'A' && d == (sbyte)'C' && e == (sbyte)'E':
+                            return "TRACE";
+                    }
+
+                    goto default;
+                }
+
+                case 6:
+                {
+                    var a = methodPtr[0];
+                    var b = methodPtr[1];
+                    var c = methodPtr[2];
+                    var d = methodPtr[3];
+                    var e = methodPtr[4];
+                    var f = methodPtr[5];
+                    switch (a)
+                    {
+                        case (sbyte)'D' when b == (sbyte)'E' && c == (sbyte)'L' && d == (sbyte)'E'
+                                             && e == (sbyte)'T' && f == (sbyte)'E':
+                            return "DELETE";
+                        case (sbyte)'M' when b == (sbyte)'E' && c == (sbyte)'T' && d == (sbyte)'H'
+                                             && e == (sbyte)'O' && f == (sbyte)'D':
+                            return "METHOD";
+                    }
+
+                    goto default;
+                }
+                case 7:
+                {
+                    var a = methodPtr[0];
+                    var b = methodPtr[1];
+                    var c = methodPtr[2];
+                    var d = methodPtr[3];
+                    var e = methodPtr[4];
+                    var f = methodPtr[5];
+                    var g = methodPtr[6];
+                    switch (a)
+                    {
+                        case (sbyte)'C' when b == (sbyte)'O' && c == (sbyte)'N' && d == (sbyte)'N'
+                                             && e == (sbyte)'E' && f == (sbyte)'C' && g == (sbyte)'T':
+                            return "CONNECT";
+                        case (sbyte)'O' when b == (sbyte)'P' && c == (sbyte)'T' && d == (sbyte)'I'
+                                             && e == (sbyte)'O' && f == (sbyte)'N' && g == (sbyte)'S':
+                            return "OPTIONS";
+                    }
+
+                    goto default;
+                }
+
+                default:
+                {
+                    var uMethodPtr = (byte*)methodPtr;
+                    return Encoding.UTF8.GetString(uMethodPtr, methodLen);
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        unsafe string PathStr(sbyte* pathPtr, int pathLen)
+        {
+            var uMethodPtr = (byte*)pathPtr;
+            return Encoding.UTF8.GetString(uMethodPtr, pathLen);
+        }
     }
-    
 }

@@ -12,60 +12,60 @@ public interface ITimeModule
     /// "Date: Thu, 01 Jan 1970 00:00:00 GMT" in UTF8.
     /// </summary>
     /// <returns></returns>
-    public u8x35 EpochAsUtf8Buff();
+    public ByteX35 EpochAsUtf8Buff();
 
     /// <summary>
     /// This is a no allocation implementation of
     /// DateTime.UtcNow.ToString("ddd, dd MMM yyyy HH:mm:ss 'GMT'", System.Globalization.CultureInfo.InvariantCulture);
     /// </summary>
     /// <param name="res">The stack memory allocated for the string</param>
-    public void UtcNowHttpStr(ref u8x35 res);
+    public void UtcNowHttpStr(ref ByteX35 res);
 }
 
 /// <inheritdoc cref="ITimeModule"/>
 
 public sealed class TimeModule : ITimeModule
 {
-    private static readonly u8x35 EpochAsUtf8BuffCached;
+    private static readonly ByteX35 EpochAsUtf8BuffCached;
 
     static TimeModule()
     {
-        EpochAsUtf8BuffCached = new u8x35();
-        EpochAsUtf8BuffCached[0] = (Byte)'D';
-        EpochAsUtf8BuffCached[1] = (Byte)'a';
-        EpochAsUtf8BuffCached[2] = (Byte)'t';
-        EpochAsUtf8BuffCached[3] = (Byte)'e';
-        EpochAsUtf8BuffCached[4] = (Byte)':';
-        EpochAsUtf8BuffCached[5] = (Byte)' ';
-        EpochAsUtf8BuffCached[6] = (Byte)' ';
-        EpochAsUtf8BuffCached[7] = (Byte)' ';
-        EpochAsUtf8BuffCached[8] = (Byte)' ';
-        EpochAsUtf8BuffCached[9] = (Byte)',';
-        EpochAsUtf8BuffCached[10] = (Byte)' ';
-        EpochAsUtf8BuffCached[11] = (Byte)'0';
-        EpochAsUtf8BuffCached[12] = (Byte)'0';
-        EpochAsUtf8BuffCached[13] = (Byte)' ';
-        EpochAsUtf8BuffCached[14] = (Byte)' ';
-        EpochAsUtf8BuffCached[15] = (Byte)' ';
-        EpochAsUtf8BuffCached[16] = (Byte)' ';
-        EpochAsUtf8BuffCached[17] = (Byte)' ';
-        EpochAsUtf8BuffCached[18] = (Byte)'0';
-        EpochAsUtf8BuffCached[19] = (Byte)'0';
-        EpochAsUtf8BuffCached[20] = (Byte)'0';
-        EpochAsUtf8BuffCached[21] = (Byte)'0';
-        EpochAsUtf8BuffCached[22] = (Byte)' ';
-        EpochAsUtf8BuffCached[23] = (Byte)'0';
-        EpochAsUtf8BuffCached[24] = (Byte)'0';
-        EpochAsUtf8BuffCached[25] = (Byte)':';
-        EpochAsUtf8BuffCached[26] = (Byte)'0';
-        EpochAsUtf8BuffCached[27] = (Byte)'0';
-        EpochAsUtf8BuffCached[28] = (Byte)':';
-        EpochAsUtf8BuffCached[29] = (Byte)'0';
-        EpochAsUtf8BuffCached[30] = (Byte)'0';
-        EpochAsUtf8BuffCached[31] = (Byte)' ';
-        EpochAsUtf8BuffCached[32] = (Byte)'G';
-        EpochAsUtf8BuffCached[33] = (Byte)'M';
-        EpochAsUtf8BuffCached[34] = (Byte)'T';
+        EpochAsUtf8BuffCached = new ByteX35();
+        EpochAsUtf8BuffCached[0] = (byte)'D';
+        EpochAsUtf8BuffCached[1] = (byte)'a';
+        EpochAsUtf8BuffCached[2] = (byte)'t';
+        EpochAsUtf8BuffCached[3] = (byte)'e';
+        EpochAsUtf8BuffCached[4] = (byte)':';
+        EpochAsUtf8BuffCached[5] = (byte)' ';
+        EpochAsUtf8BuffCached[6] = (byte)' ';
+        EpochAsUtf8BuffCached[7] = (byte)' ';
+        EpochAsUtf8BuffCached[8] = (byte)' ';
+        EpochAsUtf8BuffCached[9] = (byte)',';
+        EpochAsUtf8BuffCached[10] = (byte)' ';
+        EpochAsUtf8BuffCached[11] = (byte)'0';
+        EpochAsUtf8BuffCached[12] = (byte)'0';
+        EpochAsUtf8BuffCached[13] = (byte)' ';
+        EpochAsUtf8BuffCached[14] = (byte)' ';
+        EpochAsUtf8BuffCached[15] = (byte)' ';
+        EpochAsUtf8BuffCached[16] = (byte)' ';
+        EpochAsUtf8BuffCached[17] = (byte)' ';
+        EpochAsUtf8BuffCached[18] = (byte)'0';
+        EpochAsUtf8BuffCached[19] = (byte)'0';
+        EpochAsUtf8BuffCached[20] = (byte)'0';
+        EpochAsUtf8BuffCached[21] = (byte)'0';
+        EpochAsUtf8BuffCached[22] = (byte)' ';
+        EpochAsUtf8BuffCached[23] = (byte)'0';
+        EpochAsUtf8BuffCached[24] = (byte)'0';
+        EpochAsUtf8BuffCached[25] = (byte)':';
+        EpochAsUtf8BuffCached[26] = (byte)'0';
+        EpochAsUtf8BuffCached[27] = (byte)'0';
+        EpochAsUtf8BuffCached[28] = (byte)':';
+        EpochAsUtf8BuffCached[29] = (byte)'0';
+        EpochAsUtf8BuffCached[30] = (byte)'0';
+        EpochAsUtf8BuffCached[31] = (byte)' ';
+        EpochAsUtf8BuffCached[32] = (byte)'G';
+        EpochAsUtf8BuffCached[33] = (byte)'M';
+        EpochAsUtf8BuffCached[34] = (byte)'T';
     }
 
     private readonly ISysModule _sysModule;
@@ -80,7 +80,7 @@ public sealed class TimeModule : ITimeModule
     /// "Date: Thu, 01 Jan 1970 00:00:00 GMT" in UTF8.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public u8x35 EpochAsUtf8Buff()
+    public ByteX35 EpochAsUtf8Buff()
     {
         // This compiles to memcpy since b35 is a struct.
         return EpochAsUtf8BuffCached;
@@ -92,14 +92,14 @@ public sealed class TimeModule : ITimeModule
     /// </summary>
     /// <param name="res">The stack memory allocated for the string</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void UtcNowHttpStr(ref u8x35 res)
+    public void UtcNowHttpStr(ref ByteX35 res)
     {
         var secsSinceEpoch = SecsSinceEpoch();
         
-        const Int64 leapEpoch = 11017;
-        const Int64 daysPer400Years = 365 * 400 + 97;
-        const Int64 daysPer100Years = 365 * 100 + 24;
-        const Int64 daysPer4Years = 365 * 4 + 1;
+        const long leapEpoch = 11017;
+        const long daysPer400Years = 365 * 400 + 97;
+        const long daysPer100Years = 365 * 100 + 24;
+        const long daysPer4Years = 365 * 4 + 1;
 
         var days = (secsSinceEpoch / 86400) - leapEpoch;
         var secsOfDay = secsSinceEpoch % 86400;
@@ -139,8 +139,8 @@ public sealed class TimeModule : ITimeModule
 
         var year = 2000 + remYears + 4 * qCycles + 100 * cCycles + 400 * qcCycles;
 
-        ReadOnlySpan<Int64> monthLengths = stackalloc Int64[] { 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 31, 29 };
-        Int64 month = 0;
+        ReadOnlySpan<long> monthLengths = stackalloc long[] { 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 31, 29 };
+        long month = 0;
         foreach (var monthLength in monthLengths)
         {
             month += 1;
@@ -161,46 +161,46 @@ public sealed class TimeModule : ITimeModule
             weekDay += 7;
         }
 
-        var sec = (Byte)(secsOfDay % 60);
-        var min = (Byte)((secsOfDay % 3600) / 60);
-        var hour = (Byte)(secsOfDay / 3600);
-        var day = (Byte)mDay;
-        var monthByte = (Byte)month;
+        var sec = (byte)(secsOfDay % 60);
+        var min = (byte)((secsOfDay % 3600) / 60);
+        var hour = (byte)(secsOfDay / 3600);
+        var day = (byte)mDay;
+        var monthByte = (byte)month;
         var yearUshort = (ushort)year;
-        var weekDayByte = (Byte)weekDay;
+        var weekDayByte = (byte)weekDay;
 
 
         var weekDayStr = DayOfWeek(weekDayByte);
         var monthStr = Month(monthByte);
 
-        res[6] = (Byte)weekDayStr[0];
-        res[7] = (Byte)weekDayStr[1];
-        res[8] = (Byte)weekDayStr[2];
+        res[6] = (byte)weekDayStr[0];
+        res[7] = (byte)weekDayStr[1];
+        res[8] = (byte)weekDayStr[2];
 
-        res[11] = (Byte)(day / 10 + '0');
-        res[12] = (Byte)(day % 10 + '0');
+        res[11] = (byte)(day / 10 + '0');
+        res[12] = (byte)(day % 10 + '0');
 
-        res[14] = (Byte)monthStr[0];
-        res[15] = (Byte)monthStr[1];
-        res[16] = (Byte)monthStr[2];
+        res[14] = (byte)monthStr[0];
+        res[15] = (byte)monthStr[1];
+        res[16] = (byte)monthStr[2];
 
-        res[18] = (Byte)(yearUshort / 1000 + '0');
-        res[19] = (Byte)((yearUshort / 100) % 10 + '0');
-        res[20] = (Byte)((yearUshort / 10) % 10 + '0');
-        res[21] = (Byte)(yearUshort % 10 + '0');
+        res[18] = (byte)(yearUshort / 1000 + '0');
+        res[19] = (byte)((yearUshort / 100) % 10 + '0');
+        res[20] = (byte)((yearUshort / 10) % 10 + '0');
+        res[21] = (byte)(yearUshort % 10 + '0');
 
-        res[23] = (Byte)(hour / 10 + '0');
-        res[24] = (Byte)(hour % 10 + '0');
+        res[23] = (byte)(hour / 10 + '0');
+        res[24] = (byte)(hour % 10 + '0');
 
-        res[26] = (Byte)(min / 10 + '0');
-        res[27] = (Byte)(min % 10 + '0');
+        res[26] = (byte)(min / 10 + '0');
+        res[27] = (byte)(min % 10 + '0');
 
-        res[29] = (Byte)(sec / 10 + '0');
-        res[30] = (Byte)(sec % 10 + '0');
+        res[29] = (byte)(sec / 10 + '0');
+        res[30] = (byte)(sec % 10 + '0');
         return;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        Int64 SecsSinceEpoch()
+        long SecsSinceEpoch()
         {
             timespec ts = new();
             
@@ -216,7 +216,7 @@ public sealed class TimeModule : ITimeModule
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        string DayOfWeek(Int32 index)
+        string DayOfWeek(int index)
         {
             return index switch
             {
@@ -232,7 +232,7 @@ public sealed class TimeModule : ITimeModule
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        string Month(Int32 index)
+        string Month(int index)
         {
             return index switch
             {
